@@ -13,24 +13,30 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.arnaumaps.model.ApiCall;
+import com.example.arnaumaps.model.ModelApi;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.arnaumaps.databinding.ActivityMapsBinding;
 
 import java.util.List;
 import java.util.Locale;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
     private int LOCATION_PERMISSION_REQUEST_CODE = 1;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +63,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 getAddress(latLng.latitude, latLng.longitude);
                 ApiThread process = new ApiThread(latLng.latitude,latLng.longitude);
                 process.execute();
+
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl("https://api.sunrise-sunset.org/")
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+
+                ApiCall apiCall = retrofit.create(ApiCall.class);
+                Call<ModelApi> call = apiCall.getData(latLng.latitude,latLng.longitude);
+
+                call.enqueue(new Callback<ModelApi>(){
+                    @Override
+                    public void onResponse(Call<ModelApi> call, Response<ModelApi> response) {
+                        if(response.code()!=200){
+                            Log.i("testApi", "checkConnection");
+                            return;
+                        }
+
+                        Log.i("testApi", response.body().getStatus() + " - " + response.body().getResults().getSunrise());
+                    }
+
+                    @Override
+                    public void onFailure(Call<ModelApi> call, Throwable t) {
+
+                    }
+                });
             }
         });
         enableMyLocation();
