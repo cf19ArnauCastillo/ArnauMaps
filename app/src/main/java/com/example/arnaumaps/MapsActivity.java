@@ -18,6 +18,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.arnaumaps.databinding.ActivityMapsBinding;
 
@@ -47,16 +48,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        // Add a marker in Sydney and move the camera
-
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                Log.i("Prueba", latLng.latitude + " " + latLng.longitude);
-                getAddress(latLng.latitude, latLng.longitude);
+                Log.i("Cordenadas", latLng.latitude + " " + latLng.longitude);
                 mMap.addMarker(new MarkerOptions().position(latLng).title("New Marker"));
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                getAddress(latLng.latitude, latLng.longitude);
+                ApiThread process = new ApiThread(latLng.latitude,latLng.longitude);
+                process.execute();
             }
         });
         enableMyLocation();
@@ -70,7 +70,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             } else {
                 if (addresses.size() > 0) {
                     String msg =addresses.get(0).getFeatureName() + ", " + addresses.get(0).getLocality() +", " + addresses.get(0).getAdminArea() + ", " + addresses.get(0).getCountryName();
-
                     Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
                 }
             }
