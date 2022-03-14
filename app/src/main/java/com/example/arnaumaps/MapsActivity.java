@@ -115,7 +115,7 @@ public class MapsActivity extends FragmentActivity implements OnMyLocationButton
             Geocoder geo = new Geocoder(this.getApplicationContext(), Locale.getDefault());
             List<Address> addresses = geo.getFromLocation(lat, lng, 1);
             if (addresses.isEmpty()) {
-                Toast.makeText(this, "No s’ha trobat informació", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "No Info Found", Toast.LENGTH_LONG).show();
             } else {
                 if (addresses.size() > 0) {
                     String msg =addresses.get(0).getFeatureName() + ", " + addresses.get(0).getLocality() +", " + addresses.get(0).getAdminArea() + ", " + addresses.get(0).getCountryName();
